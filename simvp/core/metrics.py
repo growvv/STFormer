@@ -31,7 +31,6 @@ def PSNR(pred, true):
     return 20 * np.log10(255) - 10 * np.log10(mse)
 
 def SHARP(pred):
-    # print(pred.shape) # (1, 10, 1, 256, 256)
     frm = pred[0]
     frm = np.uint8(frm * 255)
     for i in range(10):

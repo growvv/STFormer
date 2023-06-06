@@ -8,7 +8,6 @@ import torch
 import numpy as np
 import os.path as osp
 from fvcore.nn import FlopCountAnalysis, flop_count_table
-import ipdb 
 from tqdm import tqdm
 
 from simvp.core import metric, Recorder
@@ -17,14 +16,6 @@ from simvp.utils import (set_seed, print_log, output_namespace, check_dir,
                          get_dataset)
 
 from torch.utils.tensorboard import SummaryWriter
-
-import imageio
-
-try:
-    import nni
-    has_nni = True
-except ImportError: 
-    has_nni = False
 
 
 class NodDistExperiment(object):
@@ -36,7 +27,6 @@ class NodDistExperiment(object):
         self.device = self._acquire_device()
         self.args.method = self.args.method.lower()
 
-        # ipdb.set_trace()
         self._preparation()
         print_log(output_namespace(self.args))
 
@@ -90,7 +80,7 @@ class NodDistExperiment(object):
         self._build_method()
 
         # load weights
-        if self.args.load:
+        if self.args.is_train == False:
             self._load()
         
 
@@ -124,14 +114,11 @@ class NodDistExperiment(object):
         recorder = Recorder(verbose=True)
         summary_writer = SummaryWriter(self.args.res_dir + 'tensorboard')
         num_updates = 0
-        # constants for other methods:
-        eta = 1.0  # PredRNN
+
         for epoch in tqdm(range(self.args.pretrain_epoch+1, self.args.pretrain_epoch+1+self.config['epoch'])):
             loss_mean = 0.0
 
-            # self.test()
-
-            if self.args.method in ['simvp', 'crevnet', 'phydnet']:
+            if self.args.method in ['simvp']:
                 num_updates, loss_mean = self.method.train_one_epoch(
                     self.train_loader, epoch, num_updates, loss_mean)
             else:
@@ -140,7 +127,7 @@ class NodDistExperiment(object):
             summary_writer.add_scalar('train_loss', loss_mean, epoch)
 
             # 保存结果
-            self.method.test_once(self.vali_loader, epoch, self.args.res_dir)
+            # self.method.test_once(self.vali_loader, epoch, self.args.res_dir)
             
             if epoch % self.args.save_step == 0:
                 self._save(str(epoch))
@@ -154,19 +141,15 @@ class NodDistExperiment(object):
         mae, mse = metric(
             preds, trues, vali_loader.dataset.mean, vali_loader.dataset.std, return_ssim_psnr=False)
         print_log('val\t mse:{}, mae:{}'.format(mse, mae))
-        if has_nni:
-            nni.report_intermediate_result(mse)
 
         return val_loss
 
     def test(self):
         inputs, trues, preds = self.method.test_one_epoch(self.test_loader, self.args.res_dir)
-        # print("output: ", inputs.shape, trues.shape, preds.shape)
-        print("test end")
 
-        print(inputs.shape, trues.shape, preds.shape)
+
         mae, mse, ssim, psnr, sharp = metric(
             preds, trues, self.test_loader.dataset.mean, self.test_loader.dataset.std, return_ssim_psnr=True)
-        metrics = np.array([mae, mse,ssim, psnr, sharp])
+        # metrics = np.array([mae, mse,ssim, psnr, sharp])
         print_log('mse:{}, mae:{}, ssim:{}, psnr:{}, sharp: {}'.format(mse, mae, ssim, psnr, sharp))
         

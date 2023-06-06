@@ -7,22 +7,7 @@ def load_data(dataname, batch_size, val_batch_size, num_workers, data_root, **kw
     valid_data_paths = kwargs.get('valid_data_paths', 'small_2000_10.npz')
     test_data_paths = kwargs.get('test_data_paths', 'small_2000_10.npz')
 
-    if dataname == 'kitticaltech':
-        from .dataloader_kitticaltech import load_data
-        return load_data(batch_size, val_batch_size, data_root, num_workers, pre_seq_length, aft_seq_length)
-    elif dataname in ['kth', 'kth20', 'kth40']:
-        from .dataloader_kth import load_data
-        return load_data(batch_size, val_batch_size, data_root, num_workers, pre_seq_length, aft_seq_length)
-    elif dataname == 'mmnist':
-        from .dataloader_moving_mnist import load_data
-        return load_data(batch_size, val_batch_size, data_root, num_workers, pre_seq_length, aft_seq_length)
-    elif dataname == 'taxibj':
-        from .dataloader_taxibj import load_data
-        return load_data(batch_size, val_batch_size, data_root, num_workers, pre_seq_length, aft_seq_length)
-    elif dataname == 'weather':
-        from .dataloader_weather import load_data
-        return load_data(batch_size, val_batch_size, data_root, num_workers)
-    elif dataname == 'radar':
+    if dataname == 'radar':
         from .dataloader_radar import load_data
         return load_data(batch_size, val_batch_size, data_root, num_workers, pre_seq_length, aft_seq_length, train_data_paths, valid_data_paths, test_data_paths)
     else:

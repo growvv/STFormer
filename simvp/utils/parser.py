@@ -15,7 +15,6 @@ def create_parser():
     parser.add_argument('--use_gpu', default=True, type=bool)
     parser.add_argument('--gpu', default=0, type=int)
     parser.add_argument('--seed', default=42, type=int)
-    parser.add_argument('--load', default=0, type=int, help='Path to checkpoint to load trained weight')
     parser.add_argument('--weight_path', default='./weight', type=str, help='Path to checkpoint to load trained weight')
     parser.add_argument('--pretrain_epoch', default=0, type=int, help='Pretrained epoch')
     # is_train
@@ -34,9 +33,9 @@ def create_parser():
     parser.add_argument('--val_batch_size', '-vb', default=1, type=int, help="Validation batch size")
     parser.add_argument('--num_workers', default=8, type=int)
     parser.add_argument('--data_root', default='./data/')
-    parser.add_argument('--dataname', '-d', default='mmnist', type=str,
-                        choices=['mmnist', 'kitticaltech', 'kth', 'kth40', 'taxibj', 'weather','radar'],
-                        help='Dataset name (default: "mmnist")')
+    parser.add_argument('--dataname', '-d', default='radar', type=str,
+                        choices=['radar', 'mmnist'],
+                        help='Dataset name (default: "radar")')
     parser.add_argument('--pre_seq_length', default=None, type=int, help="Sequence length before prediction")
     parser.add_argument('--aft_seq_length', default=None, type=int, help="Sequence length after prediction")
     parser.add_argument('--total_length', default=None, type=int, help="Total Sequence length for prediction")
@@ -44,12 +43,9 @@ def create_parser():
 
     # method parameters
     parser.add_argument('--method', '-m', default='SimVP', type=str,
-                        choices=['ConvLSTM', 'convlstm', 'CrevNet', 'crevnet', 'E3DLSTM', 'e3dlstm',
-                                 'MAU', 'mau', 'MIM', 'mim', 'PhyDNet', 'phydnet',
-                                 'PredRNN', 'predrnn', 'PredRNNpp', 'predrnnpp', 'PredRNNv2', 'predrnnv2',
-                                 'SimVP', 'simvp'],
+                        choices=['SimVP', 'simvp'],
                         help='Name of video prediction method to train (default: "SimVP")')
-    parser.add_argument('--config_file', '-c', default='./configs/mmnist/simvp/SimVP.py', type=str,
+    parser.add_argument('--config_file', '-c', default='./configs/radar/SimVP.py', type=str,
                         help='Path to the default config file')
     parser.add_argument('--model_type', default=None, type=str,
                         help='Name of model for SimVP (default: None)')

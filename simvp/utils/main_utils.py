@@ -40,7 +40,6 @@ def get_dataset(dataname, config):
     from simvp.datasets import dataset_parameters
     from simvp.datasets import load_data
     config.update(dataset_parameters[dataname])
-    print("config: ", config)
     return load_data(**config)
 
 

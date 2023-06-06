@@ -1,5 +1,21 @@
--r requirements/optional.txt
--r requirements/runtime.txt
--r requirements/tests.txt
-
-
+matplotlib
+nni
+numpy
+hickle
+packaging
+scikit-image
+six
+scikit-learn
+timm
+tqdm
+xarray
+chardet
+codecov
+future
+opencv-python
+fvcore
+nni==2.10
+tqdm
+timm
+xarray
+scikit-image==0.18.3

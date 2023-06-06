@@ -10,7 +10,6 @@ import imageio
 
 from simvp.utils import check_dir
 import os
-import ipdb
 
 class SimVP(Base_method):
     r"""SimVP
@@ -25,6 +24,10 @@ class SimVP(Base_method):
         self.model = self._build_model(self.config)
         self.model_optim, self.scheduler = self._init_optimizer(steps_per_epoch)
         self.criterion = nn.MSELoss()
+
+        # 输出模型的大小
+        # print('model size: {:.2f}M'.format(sum(p.numel() for p in self.model.parameters()) / 1000000.0))
+        # print(self.model)
 
     def _build_model(self, config):
         return SimVP_Model(**config).to(self.device)
@@ -102,30 +105,16 @@ class SimVP(Base_method):
         return preds, trues, total_loss
 
     def test_one_epoch(self, test_loader, save_dir, **kwargs):
-        # 输出模型的大小
-        print('model size: {:.2f}M'.format(sum(p.numel() for p in self.model.parameters()) / 1000000.0))
-        return [], [], []
         self.model.eval()
         inputs_lst, trues_lst, preds_lst = [], [], []
-        test_pbar = tqdm(test_loader)
-
-
-        save_dir = os.path.join(save_dir, 'npy')
-        check_dir(save_dir)
         
         for idx, (batch_x, batch_y) in tqdm(enumerate(test_loader)):
-            # ipdb.set_trace()
             with torch.no_grad():
                 pred_y = self._predict(batch_x.to(self.device))  # [1, 10, 1, 256, 256]
 
             list(map(lambda data, lst: lst.append(data.detach().cpu().numpy()), [
                  batch_x, batch_y, pred_y], [inputs_lst, trues_lst, preds_lst]))
-            
-
-            np.save(os.path.join(save_dir, f'inputs_{idx}.npy'), batch_x.detach().cpu().numpy()) # inputs_lst: [1, 1, 10, 1, 256, 256]
-            np.save(os.path.join(save_dir, f'trues_{idx}.npy'), batch_y.detach().cpu().numpy())
-            np.save(os.path.join(save_dir, f'preds_{idx}.npy'), pred_y.detach().cpu().numpy())
-            
+      
 
         inputs, trues, preds = map(
             lambda data: np.concatenate(data, axis=0), [inputs_lst, trues_lst, preds_lst])
@@ -147,28 +136,3 @@ class SimVP(Base_method):
 
         inputs, trues, preds = map(
             lambda data: np.concatenate(data, axis=0), [inputs_lst, trues_lst, preds_lst])
-
-
-        # import ipdb
-        # ipdb.set_trace()
-        save_gifs = save_dir + '/gifs/'
-        check_dir(save_gifs)
-
-        # 把一系列图片保存为gif
-        def save_gif(imgs, path):
-            imgs = imgs.transpose(0, 2, 3, 1)
-            imgs = imgs * 70
-            imgs = imgs.astype(np.uint8)
-            imageio.mimsave(path, imgs)
-
-        for i in range(min(batch_x.shape[0], 4)):
-            # 把inputs[i], trues[i], preds[i]拼起来放到同一排
-            pics = np.concatenate([inputs[i], trues[i], preds[i]], axis=-1)
-            save_gif(pics, save_gifs + f'{epoch}_{i}.gif')
-
-    # def save_model(self, save_dir, epoch):
-    #     save_dir = os.path.join(save_dir, 'checkpoints')
-    #     check_dir(save_dir)
-    #     save_model_path = os.path.join(save_dir, f'{epoch}.pth')
-        
-    #     torch.save(self.model.state_dict(), save_model_path)

@@ -5,7 +5,7 @@ import  numpy as np
 
 from timm.models.layers import DropPath, trunc_normal_
 
-from mixmlp import MixMLP22222
+from .mixmlp import MixMlp
 
 class BasicConv2d(nn.Module):
 
