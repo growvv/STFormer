@@ -133,5 +133,3 @@ figs
 .vscode
 .ipynb_checkpoints
 
-# temp
-configs/kitticaltech/simvp

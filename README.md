@@ -17,6 +17,13 @@
 
 `simvp/utils`：包含工具函数
 
+## 数据集
+适用于任何时空数据
+
+例如：
+2000条雷达回波数据集，
+格式`T x C x H x W`，其中`T`为时间维度，`H`为高度维度，`W`为宽度维度, `C`为通道维度，`C=1`，表示仅雷达。
+
 
 ## 配置环境
 
@@ -26,26 +33,26 @@
 
 2. 安装pytorch
 
-`conda install pytorch torchvision torchaudio cpuonly -c pytorch`
-需要与cuda版本对应
+`conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia`
+
+需要与系统cuda版本对应
 
 3. 安装其他依赖
+
 `pip install -r requirements.txt`
 
 ## 运行
 
 1. 修改train_radar_gsta.sh，设置数据集路径、模型保存路径等
 
-2. 运行
-`cd script`
+2. 运行 
 
-`sudo bash train_radar_gsta.sh`
+`bash script/train_radar_gsta.sh`
 
 ## 推理
 
 1. 修改infer_radar_gsta.sh，设置权重路径、数据集路径等
 
 2. 运行
-`cd script`
 
-`bash infer_radar_gsta.sh`
+`bash script/infer_radar_gsta.sh`
